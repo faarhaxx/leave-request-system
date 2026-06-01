@@ -1,11 +1,13 @@
 from django.utils import timezone
-from rest_framework import generics
+from django.shortcuts import render
+
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
-from .models import LeaveRequest
-from .serializers import LeaveRequestSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+
+from .models import LeaveRequest
+from .serializers import LeaveRequestSerializer
 from workspace.models import Membership
 
 
@@ -62,4 +64,19 @@ class UpdateLeaveStatusView(APIView):
         leave.approved_by = request.user
         leave.approved_at = timezone.now()
         leave.save()
+
         return Response({"message": f"Leave {new_status} successfully"})
+
+
+def dashboard(request):
+    leaves = LeaveRequest.objects.all().order_by('-created_at')
+
+    context = {
+        'total_leaves': leaves.count(),
+        'pending_leaves': leaves.filter(status='PENDING').count(),
+        'approved_leaves': leaves.filter(status='APPROVED').count(),
+        'rejected_leaves': leaves.filter(status='REJECTED').count(),
+        'recent_leaves': leaves[:5],
+    }
+
+    return render(request, 'dashboard.html', context)

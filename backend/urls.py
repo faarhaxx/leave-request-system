@@ -14,13 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('', lambda request: HttpResponse("Leave Request System API is running ")),
+    path('', lambda request: render(request, 'home.html')),
     path('admin/', admin.site.urls),
 
     path('api/token/', TokenObtainPairView.as_view()),
@@ -28,6 +29,7 @@ urlpatterns = [
 
     path('api/workspaces/', include('workspace.urls')),
     path('api/leaves/', include('leave.urls')),
+    path('dashboard/', include('leave.urls')),
 ]
 
 
