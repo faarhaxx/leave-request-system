@@ -74,7 +74,7 @@ class UpdateLeaveStatusView(APIView):
 
         return Response({"message": f"Leave {new_status} successfully"})
 
-
+@login_required
 def dashboard(request):
     leaves = LeaveRequest.objects.all().order_by('-created_at')
 
