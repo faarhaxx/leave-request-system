@@ -19,6 +19,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    path('', lambda request: HttpResponse("Leave Request System API is running ")),
     path('admin/', admin.site.urls),
 
     path('api/token/', TokenObtainPairView.as_view()),
