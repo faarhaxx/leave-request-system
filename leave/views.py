@@ -1,5 +1,12 @@
 from django.utils import timezone
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from workspace.models import Workspace
+
+
 
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -80,3 +87,59 @@ def dashboard(request):
     }
 
     return render(request, 'dashboard.html', context)
+
+
+@csrf_exempt
+def login_page(request):
+    error = None
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("my_leaves_page")
+        else:
+            error = "Invalid username or password"
+
+    return render(request, "login.html", {"error": error})
+
+
+def logout_page(request):
+    logout(request)
+    return redirect("login_page")
+
+
+@login_required
+def apply_leave_page(request):
+    workspaces = Workspace.objects.all()
+
+    if request.method == "POST":
+        workspace_id = request.POST.get("workspace")
+        reason = request.POST.get("reason")
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+
+        workspace = Workspace.objects.get(id=workspace_id)
+
+        LeaveRequest.objects.create(
+            user=request.user,
+            workspace=workspace,
+            reason=reason,
+            start_date=start_date,
+            end_date=end_date,
+            status="PENDING"
+        )
+
+        return redirect("my_leaves_page")
+
+    return render(request, "apply_leave.html", {"workspaces": workspaces})
+
+
+@login_required
+def my_leaves_page(request):
+    leaves = LeaveRequest.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, "my_leaves.html", {"leaves": leaves})
