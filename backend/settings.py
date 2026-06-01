@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
 
     'rest_framework',
-    'accounts',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +134,4 @@ REST_FRAMEWORK = {
     )
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CREATE_SUPERUSER = True
