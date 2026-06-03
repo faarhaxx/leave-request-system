@@ -13,11 +13,23 @@ class AccountsConfig(AppConfig):
             try:
                 from .models import User
 
-                if not User.objects.filter(username="admin").exists():
-                    User.objects.create_superuser(
-                        username="admin",
-                        email="amanfarhan1234510@gmail.com",
-                        password="weather123#"
+                users = [
+                    ("admin", "amanfarhan1234510@gmail.com", "weather123#", True, True),
+                    ("employee1", "", "confirmation123#", False, False),
+                    ("manager1", "", "authentication123#", False, False),
+                ]
+
+                for username, email, password, is_staff, is_superuser in users:
+                    user, created = User.objects.get_or_create(
+                        username=username,
+                        defaults={"email": email}
                     )
+
+                    user.set_password(password)
+                    user.is_active = True
+                    user.is_staff = is_staff
+                    user.is_superuser = is_superuser
+                    user.save()
+
             except Exception:
                 pass
