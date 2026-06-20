@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from workspace.models import Workspace
 
 
-
+from accounts.models import User
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -143,3 +143,38 @@ def apply_leave_page(request):
 def my_leaves_page(request):
     leaves = LeaveRequest.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "my_leaves.html", {"leaves": leaves})
+
+
+
+def signup_page(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if password != confirm_password:
+            return render(
+                request,
+                "signup.html",
+                {"error": "Passwords do not match"}
+            )
+
+        if User.objects.filter(username=username).exists():
+            return render(
+                request,
+                "signup.html",
+                {"error": "Username already exists"}
+            )
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return redirect("login_page")
+
+    return render(request, "signup.html")

@@ -7,6 +7,7 @@ from .views import (
     logout_page,
     apply_leave_page,
     my_leaves_page,
+     signup_page,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('logout/', logout_page, name='logout_page'),
     path('apply/', apply_leave_page, name='apply_leave_page'),
     path('my-leaves/', my_leaves_page, name='my_leaves_page'),
+    path('signup/', signup_page, name='signup_page'),
 ]
